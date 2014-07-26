@@ -21,7 +21,11 @@ class Fanfou(FanfouBase.FanfouBase):
             "home_timeline":
                 "http://api.fanfou.com/statuses/home_timeline.json",
             "update":
-                "http://api.fanfou.com/statuses/update.json"
+                "http://api.fanfou.com/statuses/update.json",
+            "mentions":
+                "http://api.fanfou.com/statuses/mentions.json",
+            "favorites":
+                "http://api.fanfou.com/favorites/id.json",
         }
 
     def statuses_update(self, status):
@@ -30,8 +34,9 @@ class Fanfou(FanfouBase.FanfouBase):
         if status_len > 140:
             raise Exception("Invalid status; Too many characters. " +
                             "It was not sent.")
-        elif status_len < 0:
-            raise Exception("Invalid status; It's empty. It was not sent.")
+        elif status_len <= 0:
+            raise Exception("Invalid status; It is an empty string." +
+                " It was not sent.")
 
         # send status
         data = { "status": status }
@@ -64,6 +69,37 @@ class Fanfou(FanfouBase.FanfouBase):
         # parse response
         return self.parse_rep_messages(rep_data)
 
+    def get_statuses_mentions(self, opts):
+        data = {
+            "count": opts.get("count", 10),
+        }
+        try:
+            rep_data = self.send_api_req({
+                "method": "GET",
+                "base_url": self.urls["mentions"],
+                "req_data": data,
+            })
+        except Exception, err:
+            LOG.error("cannot access status mentions, err %s", err)
+            raise err
+        # parse response
+        return self.parse_rep_messages(rep_data)
+
+    def get_favorites(self, opts):
+        data = {
+            "count": opts.get("count", 10),
+        }
+        try:
+            rep_data = self.send_api_req({
+                "method": "GET",
+                "base_url": self.urls["favorites"],
+                "req_data": data,
+            })
+        except Exception, err:
+            LOG.error("cannot access favorites, err %s", err)
+            raise err
+        return self.parse_rep_messages(rep_data)
+
 
 # The test entry function
 def main():
@@ -82,6 +118,20 @@ def main():
     # for tm_ln in tm_lines:
     #     LOG.debug("usr: %s (%s) - msg: %s",
     #         tm_ln["user_name"], tm_ln["created_at"], tm_ln["text"])
+    #     LOG.debug("---------------------")
+    # > statuses mentions
+    # mentions = fanfou.get_statuses_mentions({ "count": 10 })
+    # LOG.debug("mentions: len=%d", len(mentions))
+    # for mention in mentions:
+    #     LOG.debug("usr: %s (%s) - msg: %s",
+    #         mention["user_name"], mention["created_at"], mention["text"])
+    #     LOG.debug("---------------------")
+    # > favorites
+    # favorites = fanfou.get_favorites({ "count": 10 })
+    # LOG.debug("favorites: len=%d", len(favorites))
+    # for fav in favorites:
+    #     LOG.debug("usr: %s (%s) - msg: %s",
+    #         fav["user_name"], fav["created_at"], fav["text"])
     #     LOG.debug("---------------------")
     # > Status post
     # ret_item = fanfou.statuses_update("Fanfou API Test")

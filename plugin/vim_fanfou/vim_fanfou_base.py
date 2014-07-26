@@ -84,8 +84,11 @@ class VimFanfouBase(object):
 
     def update_buf_key_map(self):
         self._vim.vim_batch([
-            "nnoremap <buffer> <silent> <Leader><Leader> " +
-            ":FanfouRefresh<cr>"
+            "nnoremap <buffer> <silent> <Leader><Leader> :FanfouRefresh<cr>",
+            "nnoremap <buffer> <silent> <Leader>h :FanfouHomeTimeline<cr>",
+            "nnoremap <buffer> <silent> <Leader>m :FanfouMentions<cr>",
+            "nnoremap <buffer> <silent> <Leader>s :FanfouFavorites<cr>",
+            "nnoremap <buffer> <silent> <Leader>p :FanfouPostStatus<cr>",
         ])
 
     def update_buf_syntax(self):
@@ -105,12 +108,18 @@ class VimFanfouBase(object):
             r"syn match fanfouTimeBar /|/ contained",
             "hi default link fanfouTimeBar FanfouIgnore",
             "hi default link fanfouTime String",
+            # reply
+            r"syn match fanfouReply /\w\@<!@\(\w\|\.\|[^\x00-\x7f]\)\+/",
+            "hi default link fanfouReply Label",
             # title
             r"syn match fanfouTitle " +
             r"/^\%(\w\+:\)\@!.\+\*$/ contains=fanfouTitleStar",
             r"syn match fanfouTitleStar /\*$/ contained",
             "hi default link fanfouTitle Title",
             "hi default link fanfouTitleStar FanfouIgnore",
+            # hash
+            r"syn match fanfouHash /#[^#]\+#/",
+            "hi default link fanfouHash Underlined",
             # web url
             r"syn match FanfouUrl " +
             r"'\%(https\=://\|www\.\)[a-zA-Z0-9_./\-:@]\+'",

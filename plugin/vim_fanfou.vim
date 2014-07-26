@@ -68,6 +68,26 @@ VIM_FANFOU.update_home_timeline()
 end_python
 endfunction
 
+" get Fanfou home timeline
+function! s:update_mentions()
+    call s:init()
+python << end_python
+from vim_fanfou import vim_fanfou
+VIM_FANFOU = vim_fanfou.VimFanfou.get_instance()
+VIM_FANFOU.update_mentions()
+end_python
+endfunction
+
+" get Fanfou favorites
+function! s:update_favorites()
+    call s:init()
+python << end_python
+from vim_fanfou import vim_fanfou
+VIM_FANFOU = vim_fanfou.VimFanfou.get_instance()
+VIM_FANFOU.update_favorites()
+end_python
+endfunction
+
 " post status
 function! s:post_status()
     call s:init()
@@ -93,6 +113,7 @@ VIM_FANFOU.refresh()
 end_python
 endfunction
 
+" re-set OAuth token
 function! s:login()
     call s:init()
 python << end_python
@@ -102,9 +123,26 @@ VIM_FANFOU.login()
 end_python
 endfunction
 
+" unittest
+function! VimFanfouTests()
+    call s:init()
+python << end_python
+from vim_fanfou import vim_fanfou_unittest
+vim_fanfou_unittest.vim_fanfou_tests()
+end_python
+endfunction
+
 " Exports VIM commands
 if !exists(":FanfouHomeTimeline")
     command FanfouHomeTimeline :call s:update_home_timeline()
+endif
+
+if !exists(":FanfouMentions")
+    command FanfouMentions :call s:update_mentions()
+endif
+
+if !exists(":FanfouFavorites")
+    command FanfouFavorites :call s:update_favorites()
 endif
 
 if !exists(":FanfouRefresh")
